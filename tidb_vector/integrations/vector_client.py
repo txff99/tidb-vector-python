@@ -73,6 +73,7 @@ class QueryResult:
     document: str
     metadata: dict
     distance: float
+    update_time: str
 
 
 class TiDBVectorClient:
@@ -310,6 +311,7 @@ class TiDBVectorClient:
                 metadata=doc.meta,
                 id=doc.id,
                 distance=doc.distance,
+                update_time=doc.update_time
             )
             for doc in relevant_docs
         ]
@@ -334,6 +336,7 @@ class TiDBVectorClient:
                         self._table_model.meta,
                         self._table_model.document,
                         self.distance_strategy(query_embedding).label("distance"),
+                        self._table_model.update_time,
                     )
                     .filter(filter_by)
                     .order_by(sqlalchemy.asc("distance"))
@@ -350,6 +353,7 @@ class TiDBVectorClient:
                         self._table_model.meta,
                         self._table_model.document,
                         self.distance_strategy(query_embedding).label("distance"),
+                        self._table_model.update_time,
                     )
                     .order_by(sqlalchemy.asc("distance"))
                     .limit(post_filter_multiplier * k * 10)
@@ -362,6 +366,7 @@ class TiDBVectorClient:
                         subquery.c.meta,
                         subquery.c.document,
                         subquery.c.distance,
+                        subquery.c.update_time,
                     )
                     .filter(filter_by)
                     .order_by(sqlalchemy.asc(subquery.c.distance))
